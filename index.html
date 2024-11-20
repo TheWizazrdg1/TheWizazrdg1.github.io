@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .data {
+            font-size: 1.5rem;
+            margin: 10px 0;
+        }
+        button {
+            margin: 10px 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .modal-content h2 {
+            margin-top: 0;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .close-btn, .crud-btn {
+            margin: 10px 5px;
+            background: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .crud-btn {
+            background: #2575fc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Datos de Sensores</h1>
+        <div class="data">
+            <p id="temperatura">Temperatura: --- °C</p>
+            <p id="humedad">Humedad: --- %</p>
+        </div>
+        <button onclick="abrirModal()">Ver Historial</button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modalHistorial">
+        <div class="modal-content">
+            <h2>Historial de Sensores</h2>
+            <ul id="historial">
+                <!-- Datos del historial se generarán aquí -->
+            </ul>
+            <div class="input-group">
+                <label for="fecha">Fecha</label>
+                <input type="date" id="fecha">
+            </div>
+            <div class="input-group">
+                <label for="temperaturaInput">Temperatura</label>
+                <input type="number" id="temperaturaInput" placeholder="Ej: 25.0">
+            </div>
+            <div class="input-group">
+                <label for="humedadInput">Humedad</label>
+                <input type="number" id="humedadInput" placeholder="Ej: 50.5">
+            </div>
+            <button class="crud-btn" onclick="agregarRegistro()">Agregar</button>
+            <button class="close-btn" onclick="cerrarModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        let historialDatos = [
+            { fecha: '2024-11-18', temperatura: '22.5 °C', humedad: '45.3 %' },
+            { fecha: '2024-11-17', temperatura: '25.0 °C', humedad: '50.1 %' },
+        ];
+
+        function abrirModal() {
+            const modal = document.getElementById('modalHistorial');
+            modal.style.display = 'flex';
+            mostrarHistorial();
+        }
+
+        function cerrarModal() {
+            const modal = document.getElementById('modalHistorial');
+            modal.style.display = 'none';
+        }
+
+        function mostrarHistorial() {
+            const historialUl = document.getElementById('historial');
+            historialUl.innerHTML = '';
+            historialDatos.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    ${item.fecha} - Temperatura: ${item.temperatura}, Humedad: ${item.humedad}
+                    <button class="crud-btn" onclick="editarRegistro(${index})">Editar</button>
+                    <button class="crud-btn" onclick="eliminarRegistro(${index})">Eliminar</button>
+                `;
+                historialUl.appendChild(li);
+            });
+        }
+
+        function agregarRegistro() {
+            const fecha = document.getElementById('fecha').value;
+            const temperatura = document.getElementById('temperaturaInput').value + ' °C';
+            const humedad = document.getElementById('humedadInput').value + ' %';
+
+            if (fecha && temperatura && humedad) {
+                historialDatos.push({ fecha, temperatura, humedad });
+                mostrarHistorial();
+            } else {
+                alert('Por favor, completa todos los campos.');
+            }
+        }
+
+        function editarRegistro(index) {
+            const nuevoFecha = prompt('Nueva fecha (YYYY-MM-DD)', historialDatos[index].fecha);
+            const nuevaTemperatura = prompt('Nueva temperatura (Ej: 25.0 °C)', historialDatos[index].temperatura);
+            const nuevaHumedad = prompt('Nueva humedad (Ej: 50.5 %)', historialDatos[index].humedad);
+
+            if (nuevoFecha && nuevaTemperatura && nuevaHumedad) {
+                historialDatos[index] = { fecha: nuevoFecha, temperatura: nuevaTemperatura, humedad: nuevaHumedad };
+                mostrarHistorial();
+            } else {
+                alert('No se realizaron cambios.');
+            }
+        }
+
+        function eliminarRegistro(index) {
+            if (confirm('¿Estás seguro de eliminar este registro?')) {
+                historialDatos.splice(index, 1);
+                mostrarHistorial();
+            }
+        }
+
+        function actualizarDatos() {
+            const temperatura = (Math.random() * (35 - 15) + 15).toFixed(1) + ' °C';
+            const humedad = (Math.random() * (100 - 30) + 30).toFixed(1) + ' %';
+            document.getElementById('temperatura').textContent = `Temperatura: ${temperatura}`;
+            document.getElementById('humedad').textContent = `Humedad: ${humedad}`;
+        }
+
+        setInterval(actualizarDatos, 50000);
+    </script>
+</body>
+</html>
